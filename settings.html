@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epic Enhanced - Settings</title>
+    <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <h2>Settings</h2>
+            <ul>
+                <li class="active-tab" data-tab="general">General</li>
+                <li data-tab="library">Library</li>
+                <li data-tab="price">Price Comparison</li>
+            </ul>
+        </nav>
+        <main class="content">
+            <div id="general" class="tab-content active">
+                <h1>General Settings</h1>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>"In Library" Indicator</h3>
+                        <p>When enabled, game tiles are darkened and an "In Library" pill is shown when hovering over offers you own.</p>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" id="inLibraryIndicatorToggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>Preview on Hover</h3>
+                        <p>When enabled, hovering over a game card will show a larger preview window with screenshots, descriptions, and more.</p>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" id="previewOnHoverToggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div id="library" class="tab-content">
+                <h1>Your Library</h1>
+                <div id="library-controls">
+                    <button id="clear-library-btn" class="btn-danger">Clear All</button>
+                    <select id="library-sort">
+                        <option value="az">Sort: A-Z</option>
+                        <option value="za">Sort: Z-A</option>
+                        <option value="recent">Sort: Recently Added</option>
+                    </select>
+                    <input type="text" id="library-search" placeholder="Search your library...">
+                    <span id="library-game-count"></span>
+                </div>
+                <div id="owned-games-list">
+                </div>
+            </div>
+            <div id="price" class="tab-content">
+                <h1>Regional Price Comparison</h1>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>Enable Price Comparison</h3>
+                        <p>Show a popup with regional price comparisons when hovering over the price on a game's store page.</p>
+                    </div>
+                    <div class="setting-control">
+                        <label class="switch">
+                            <input type="checkbox" id="priceComparisonToggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <h3>Compared Countries</h3>
+                        <p>Add or remove countries to compare prices against. Your local currency will always be the baseline.</p>
+                    </div>
+                </div>
+                <div id="price-settings-container">
+                    <div class="country-actions">
+                        <select id="country-select"></select>
+                        <button id="add-country-btn">Add</button>
+                        <button id="default-countries-btn">Defaults</button>
+                        <button id="clear-countries-btn">Clear</button>
+                    </div>
+                    <div id="country-list" class="country-list">
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="confirmation-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h2>Confirm Clear Library</h2>
+            <p>This will remove games from your local cache. You may need to sync your library again to restore transaction history. Are you sure you want to continue?</p>
+            
+            <div class="modal-option">
+                <input type="checkbox" id="clear-synced-only-checkbox">
+                <label for="clear-synced-only-checkbox">Clear library cache synced from your transaction history only.</label>
+            </div>
+
+            <div class="modal-actions">
+                <button id="confirm-clear-btn" class="btn-danger">Yes, Clear</button>
+                <button id="cancel-clear-btn" class="btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="settings.js"></script>
+</body>
+</html>

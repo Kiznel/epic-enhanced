@@ -1,0 +1,356 @@
+/* styles.css */
+/* Version: 0.9.5 - Fixed preview card layout issue. */
+
+/* --- Owned Game Indicator --- */
+.epic-enhanced-in-library-popup {
+  position: fixed; 
+  z-index: 10000;
+  pointer-events: none;
+  background-color: #0078f2;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  white-space: nowrap;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
+  box-sizing: border-box;
+  border: none;
+}
+
+.epic-enhanced-in-library-popup.visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.epic-enhanced-in-library-popup .popup-icon {
+  width: 0.9em; 
+  height: 0.9em; 
+  margin-right: 0.5em; 
+  color: white;
+}
+
+.epic-enhanced-in-library-popup .popup-text {
+  color: white;
+}
+
+/* --- Owned Game Poster Darkening --- */
+.epic-enhanced-owned-poster-darken img,
+.epic-enhanced-owned-poster-darken picture img {
+  filter: brightness(25%);
+  transition: filter 0.3s ease-in-out;
+}
+.epic-enhanced-owned-poster-darken:hover img,
+.epic-enhanced-owned-poster-darken:hover picture img {
+  filter: brightness(50%);
+}
+
+/* --- Preview on Hover Styles --- */
+.epic-enhanced-preview-overlay {
+    position: fixed;
+    background-color: #181818;
+    border: 1px solid #2a2a2a;
+    border-radius: 8px;
+    z-index: 10001;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transform: scale(0.95);
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+    pointer-events: none;
+    visibility: hidden;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.epic-enhanced-preview-overlay.visible {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+    visibility: visible;
+}
+
+.preview-carousel-container {
+    width: 100%;
+    height: 55%; 
+    position: relative;
+    background-color: #000;
+    flex-shrink: 0; /* Prevent carousel from shrinking */
+}
+
+.preview-carousel-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0; left: 0;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.preview-carousel-image.active {
+    opacity: 1;
+}
+
+.carousel-progress-bar {
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.carousel-progress-bar-inner {
+    height: 100%;
+    background-color: #0078f2;
+    width: 0;
+}
+
+@keyframes progressBarAnimation {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+.preview-title-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px 5px 15px;
+    flex-shrink: 0;
+}
+
+.preview-title-text {
+    font-size: 22px;
+    font-weight: bold;
+    color: #fff;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    min-width: 0; /* Allow text to shrink and show ellipsis */
+}
+
+.preview-in-library-pill {
+    background-color: #0078f2;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.preview-description {
+    font-size: 13px;
+    color: #bbb;
+    padding: 0 15px;
+    line-height: 1.5;
+    flex-grow: 1;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.preview-tags-container {
+    padding: 10px 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.preview-tag {
+    background-color: #2a2a2a;
+    color: #ddd;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+.preview-release-info {
+    padding: 0 15px 10px 15px;
+    font-size: 12px;
+    display: flex;
+    justify-content: flex-start;
+    flex-shrink: 0;
+}
+.preview-release-label { color: #888; margin-right: 5px; }
+.preview-release-value { color: #ddd; font-weight: normal; }
+
+
+.preview-actions-container {
+    display: flex;
+    gap: 10px;
+    padding: 0 15px 15px 15px;
+    margin-top: auto; /* Pushes to the bottom */
+    flex-shrink: 0;
+}
+
+.preview-action-button {
+    flex-grow: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.preview-action-button--secondary {
+    background-color: #333;
+    color: white;
+}
+.preview-action-button--secondary:hover { background-color: #444; }
+
+.preview-action-button:disabled {
+    background-color: #555 !important;
+    color: #999 !important;
+    cursor: not-allowed;
+}
+
+
+/* --- Loading Indicators --- */
+[data-component] { position: relative; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.epic-enhanced-loading-indicator {
+    position: absolute; top: 0.75rem; left: 0.75rem;
+    width: 20px; height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin 1s linear infinite; z-index: 10;
+}
+.price-loading-spinner {
+    width: 24px; height: 24px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #0078f2; border-radius: 50%;
+    animation: spin 1s linear infinite; margin: 10px auto;
+}
+
+/* --- Regional Price Popup Styles --- */
+.epic-enhanced-price-hover-enabled {
+    cursor: help;
+}
+
+.epic-enhanced-regional-price-popup {
+    position: fixed; background-color: #1c1c1c;
+    border: 1px solid #3a3a3a; border-radius: 8px;
+    z-index: 10002; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    opacity: 0; transform: scale(0.98) translateY(-10px);
+    transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+    pointer-events: none; visibility: hidden;
+    padding: 10px; font-family: 'Inter', Arial, sans-serif;
+    color: #e0e0e0; font-size: 14px; min-width: 320px;
+}
+.epic-enhanced-regional-price-popup.visible {
+    opacity: 1; transform: scale(1) translateY(0);
+    pointer-events: auto; visibility: visible;
+}
+
+.price-comparison-scroll-container {
+    max-height: 240px; /* Approx 6.5 items */
+    overflow-y: auto;
+    padding-right: 5px; /* Space for scrollbar */
+}
+
+/* Dark Theme Scrollbar */
+.price-comparison-scroll-container::-webkit-scrollbar {
+    width: 8px;
+}
+.price-comparison-scroll-container::-webkit-scrollbar-track {
+    background: #2a2a2a;
+    border-radius: 4px;
+}
+.price-comparison-scroll-container::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 4px;
+    border: 2px solid #2a2a2a;
+}
+.price-comparison-scroll-container::-webkit-scrollbar-thumb:hover {
+    background-color: #777;
+}
+
+
+.price-comparison-table {
+    display: grid; 
+    grid-template-columns: auto 1fr 1fr 1fr;
+    gap: 8px 12px; 
+    align-items: center;
+}
+.price-row { display: contents; }
+.price-row > div {
+    padding: 4px 0; text-align: right; white-space: nowrap;
+}
+
+.price-flag-cell {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.price-country-flag {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #333;
+}
+
+.price-cheaper { color: #4CAF50; }
+.price-expensive { color: #F44336; }
+.price-equal { color: #9E9E9E; }
+.price-error-cell {
+    grid-column: 2 / 5; text-align: center;
+    color: #bbbbbb; font-style: italic;
+}
+.price-error { padding: 10px; text-align: center; color: #ff8a80; }
+
+/* --- Styles for popup.html --- */
+body.popup-body {
+    font-family: 'Inter', Arial, sans-serif; width: 280px; padding: 15px;
+    text-align: center; background-color: #202020; color: #e0e0e0; margin: 0;
+}
+.popup-body h3 {
+    color: #ffffff; margin-top: 0; margin-bottom: 10px;
+}
+.popup-body button#syncButton {
+    background-color: #0078f2; color: white; border: none;
+    padding: 10px 15px; border-radius: 5px; font-size: 14px; cursor: pointer;
+    transition: background-color 0.2s; width: 100%; box-sizing: border-box;
+    margin-top: 5px; margin-bottom: 10px;
+}
+.popup-body button#syncButton:hover:not(:disabled) { background-color: #005bb5; }
+.popup-body button#syncButton:disabled {
+    background-color: #555555; color: #999999; cursor: not-allowed;
+}
+.popup-body p {
+    font-size: 12px; color: #bbbbbb; line-height: 1.4;
+    margin-top: 5px; margin-bottom: 10px;
+}
+.popup-body #lastSyncedTime {
+    font-size: 11px; color: #999999; margin-bottom: 5px; min-height: 14px;
+}
+.popup-body #syncProgressText {
+    font-size: 11px; color: #aaaaaa; min-height: 14px;
+    margin-top: -5px; margin-bottom: 10px;
+}
+.popup-body #syncStatus {
+    margin-top: 10px; font-weight: normal; font-size: 11.5px;
+    padding: 6px 8px; border-radius: 4px; min-height: 18px;
+}
+.popup-body .status-neutral { background-color: #444; color: #ddd; }
+.popup-body .status-error { background-color: #5c2323; color: #ffc0c0; }
+.popup-body .status-success { background-color: #235c23; color: #c0ffc0; }
+.popup-body .status-progress { background-color: #234a5c; color: #c0e7ff; }
+.popup-body .privacy-note { font-size: 10px; color: #888888; margin-top:15px; }

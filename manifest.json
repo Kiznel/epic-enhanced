@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "Epic Enhanced",
+  "version": "2.1.0",
+  "description": "Enhances the Epic Games Store with an 'In Library' indicator, game card previews, and regional price comparisons.",
+  "permissions": [
+    "storage",
+    "scripting",
+    "offscreen",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "*://store.epicgames.com/*",
+    "*://www.epicgames.com/account/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://store.epicgames.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Epic Enhanced - Sync Library"
+  },
+  "options_page": "settings.html",
+  "icons": {
+    "128": "images/icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  }
+}
