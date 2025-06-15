@@ -1,5 +1,5 @@
 /* settings.css */
-/* Version 2.8.0 - Added selective clear checkbox */
+/* Version 3.1.0 - Fixed hover styles for library controls. */
 
 body {
     font-family: 'Inter', Arial, sans-serif;
@@ -279,22 +279,26 @@ input:checked + .slider:before {
     flex-shrink: 0;
 }
 
-#library-controls button:not(.btn-danger):hover:not(:disabled) {
+/* MODIFIED: Generic hover for non-danger controls */
+#library-controls button:not(.btn-danger):hover:not(:disabled),
+#library-controls select:hover:not(:disabled) {
     background-color: #444;
 }
 
-.btn-danger {
+/* Themed danger button without icon */
+#library-controls .btn-danger {
     background-color: #633232;
     border-color: #8a4e4e;
     color: #ffffff;
 }
 
-.btn-danger:hover:not(:disabled) {
+/* MODIFIED: Specific hover for danger button to override generic rule */
+#library-controls .btn-danger:hover:not(:disabled) {
     background-color: #4a2727;
     border-color: #6c3c3c;
 }
 
-.btn-danger:active {
+#library-controls .btn-danger:active {
     background-color: #3e2121;
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
 }
@@ -409,7 +413,6 @@ input:checked + .slider:before {
     transform: translate(-50%, -50%);
     font-weight: bold;
 }
-
 
 .modal-actions {
     margin-top: 30px;
