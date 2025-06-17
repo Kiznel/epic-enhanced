@@ -1,5 +1,5 @@
 /* styles.css */
-/* Version: 0.9.5 - Fixed preview card layout issue. */
+/* Version: 1.6.0 - Final styling updates and bug fixes. */
 
 /* --- Owned Game Indicator --- */
 .epic-enhanced-in-library-popup {
@@ -83,7 +83,7 @@
     height: 55%; 
     position: relative;
     background-color: #000;
-    flex-shrink: 0; /* Prevent carousel from shrinking */
+    flex-shrink: 0;
 }
 
 .preview-carousel-image {
@@ -134,7 +134,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
-    min-width: 0; /* Allow text to shrink and show ellipsis */
+    min-width: 0;
 }
 
 .preview-in-library-pill {
@@ -189,9 +189,9 @@
 
 .preview-actions-container {
     display: flex;
-    gap: 10px;
+    justify-content: center;
     padding: 0 15px 15px 15px;
-    margin-top: auto; /* Pushes to the bottom */
+    margin-top: auto;
     flex-shrink: 0;
 }
 
@@ -204,6 +204,7 @@
     font-weight: bold;
     cursor: pointer;
     transition: background-color 0.2s;
+    text-align: center;
 }
 
 .preview-action-button--secondary {
@@ -212,9 +213,38 @@
 }
 .preview-action-button--secondary:hover { background-color: #444; }
 
+
 .preview-action-button:disabled {
     background-color: #555 !important;
     color: #999 !important;
+    cursor: not-allowed;
+}
+
+/* --- New Quick-Purchase Link Button --- */
+.epic-enhanced-quick-purchase-link-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 12px;
+    border: 1px solid #555;
+    background-color: #333;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 8px; /* MODIFIED: Increased border radius */
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+    text-align: center; /* ADDED: Ensure text is centered */
+}
+
+.epic-enhanced-quick-purchase-link-btn:hover:not(:disabled) {
+    background-color: #444;
+    border-color: #777;
+}
+
+.epic-enhanced-quick-purchase-link-btn:disabled {
+    background-color: #252525;
+    color: #666;
+    border-color: #333;
     cursor: not-allowed;
 }
 
@@ -245,21 +275,62 @@
     position: fixed; background-color: #1c1c1c;
     border: 1px solid #3a3a3a; border-radius: 8px;
     z-index: 10002; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    opacity: 0; transform: scale(0.98) translateY(-10px);
-    transition: opacity 0.15s ease-out, transform 0.15s ease-out;
+    opacity: 0; 
+    transform: scale(0.98) translateX(10px);
+    transition: opacity 0.15s ease-out, transform 0.15s ease-out, top 0.1s ease-out, left 0.1s ease-out;
     pointer-events: none; visibility: hidden;
     padding: 10px; font-family: 'Inter', Arial, sans-serif;
     color: #e0e0e0; font-size: 14px; min-width: 320px;
 }
 .epic-enhanced-regional-price-popup.visible {
-    opacity: 1; transform: scale(1) translateY(0);
+    opacity: 1; 
+    transform: scale(1) translateX(0);
     pointer-events: auto; visibility: visible;
 }
 
+.epic-enhanced-regional-price-popup::after, 
+.epic-enhanced-regional-price-popup::before {
+    content: ' ';
+    height: 0;
+    width: 0;
+    position: absolute;
+    top: 50%;
+    pointer-events: none;
+}
+
+/* Default arrow (pointing right) */
+.epic-enhanced-regional-price-popup::after {
+    border-style: solid;
+    border-width: 8px;
+    border-color: transparent transparent transparent #1c1c1c;
+    margin-top: -8px;
+    left: 100%;
+}
+.epic-enhanced-regional-price-popup::before {
+    border-style: solid;
+    border-width: 9px;
+    border-color: transparent transparent transparent #3a3a3a;
+    margin-top: -9px;
+    left: 100%;
+}
+
+/* Flipped arrow (pointing left) for when popup is on the right */
+.epic-enhanced-regional-price-popup.arrow-on-left::after {
+    left: auto;
+    right: 100%;
+    border-color: transparent #1c1c1c transparent transparent;
+}
+.epic-enhanced-regional-price-popup.arrow-on-left::before {
+    left: auto;
+    right: 100%;
+    border-color: transparent #3a3a3a transparent transparent;
+}
+
+
 .price-comparison-scroll-container {
-    max-height: 240px; /* Approx 6.5 items */
+    max-height: 240px;
     overflow-y: auto;
-    padding-right: 5px; /* Space for scrollbar */
+    padding-right: 5px;
 }
 
 /* Dark Theme Scrollbar */

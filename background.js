@@ -1,5 +1,5 @@
 // background.js
-// Version: 2.5.0 - Implemented selective library clearing.
+// Version: 2.8.0 - Added default setting for Quick-Purchase Link.
 
 // --- Constants for Storage Keys ---
 const OWNED_GAMES_DATA_KEY = 'epicEnhanced_ownedGamesData';
@@ -27,6 +27,7 @@ chrome.runtime.onInstalled.addListener((details) => {
             previewOnHover: true,
             enablePriceComparison: true,
             enableInLibraryIndicator: true,
+            enableQuickPurchaseLink: true,
             priceComparedCountries: ['GB', 'US', 'FR', 'AU', 'JP', 'BR'],
             librarySortPreference: 'az'
         });
@@ -225,6 +226,30 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     console.log("Epic Enhanced: Library cache completely cleared.");
                 }
                 await chrome.runtime.sendMessage({ action: "libraryCacheUpdated" }).catch(e => {});
+                sendResponse({ success: true });
+            })();
+            break;
+        case "removeGameFromLibrary":
+             (async () => {
+                const { gameKey } = request;
+                if (!gameKey) {
+                    sendResponse({ success: false, error: "No game key provided."});
+                    return;
+                }
+                const { [OWNED_GAMES_DATA_KEY]: ownedGames = [] } = await chrome.storage.local.get(OWNED_GAMES_DATA_KEY);
+                
+                const updatedLibrary = ownedGames.filter(game => {
+                    const key = game.offerId || game.productSlug || game.originalDescription;
+                    return key !== gameKey;
+                });
+
+                await chrome.storage.local.set({ 
+                    [OWNED_GAMES_DATA_KEY]: updatedLibrary, 
+                    [GAMES_FOUND_COUNT_KEY]: updatedLibrary.length 
+                });
+
+                await chrome.runtime.sendMessage({ action: "libraryCacheUpdated" }).catch(e => {});
+                console.log(`Epic Enhanced: Removed item '${gameKey}' from library.`);
                 sendResponse({ success: true });
             })();
             break;

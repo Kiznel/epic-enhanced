@@ -1,5 +1,5 @@
 /* settings.css */
-/* Version 3.1.0 - Fixed hover styles for library controls. */
+/* Version 3.7.0 - Aligned remove button styling across settings tabs. */
 
 body {
     font-family: 'Inter', Arial, sans-serif;
@@ -221,20 +221,11 @@ input:checked + .slider:before {
     background-color: #2a2a2a;
     padding: 10px 15px;
     border-radius: 5px;
+    transition: background-color 0.2s;
 }
 
-.remove-country-btn {
-    background: none;
-    border: none;
-    color: #aaa;
-    font-size: 20px;
-    cursor: pointer;
-    line-height: 1;
-    padding: 0 5px;
-}
-
-.remove-country-btn:hover {
-    color: #ff4d4d;
+.country-item:hover {
+    background-color: #383838;
 }
 
 /* Library Tab Styles */
@@ -279,20 +270,17 @@ input:checked + .slider:before {
     flex-shrink: 0;
 }
 
-/* MODIFIED: Generic hover for non-danger controls */
 #library-controls button:not(.btn-danger):hover:not(:disabled),
 #library-controls select:hover:not(:disabled) {
     background-color: #444;
 }
 
-/* Themed danger button without icon */
 #library-controls .btn-danger {
     background-color: #633232;
     border-color: #8a4e4e;
     color: #ffffff;
 }
 
-/* MODIFIED: Specific hover for danger button to override generic rule */
 #library-controls .btn-danger:hover:not(:disabled) {
     background-color: #4a2727;
     border-color: #6c3c3c;
@@ -318,17 +306,66 @@ input:checked + .slider:before {
 #owned-games-list {
     flex-grow: 1;
     overflow-y: auto;
+    padding-right: 10px;
 }
 
 .owned-game-item {
-    padding: 15px 0;
-    border-bottom: 1px solid #2a2a2a;
+    background-color: #2a2a2a;
+    border-radius: 6px;
+    padding: 12px 15px 12px 20px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s, opacity 0.2s;
+}
+
+.owned-game-item:hover {
+    background-color: #383838;
 }
 
 .owned-game-title {
-    color: #ffffff;
+    color: #b0b0b0;
     font-size: 16px;
     font-weight: 500;
+    transition: color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding-right: 15px;
+}
+
+.owned-game-item:hover .owned-game-title {
+    color: #ffffff;
+}
+
+/* MODIFIED: Combined styles for consistent remove buttons */
+.remove-game-btn,
+.remove-country-btn {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    line-height: 1;
+    padding: 6px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s, color 0.2s, background-color 0.2s;
+    flex-shrink: 0;
+}
+
+.owned-game-item:hover .remove-game-btn,
+.country-item:hover .remove-country-btn {
+    opacity: 1;
+}
+
+.remove-game-btn:hover,
+.remove-country-btn:hover {
+    color: #ff6b6b;
+    background-color: #444;
 }
 
 .library-empty-message {

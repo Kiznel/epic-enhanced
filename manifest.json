@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Epic Enhanced",
-    "version": "3.1.0",
+    "version": "3.8.0",
     "description": "Enhances the Epic Games Store with features like in-library indicators, hover-previews, and regional price comparisons.",
     "permissions": [
         "storage",
@@ -11,8 +11,7 @@
         "scripting"
     ],
     "host_permissions": [
-        "https://*.epicgames.com/",
-        "https://*.exchangerate-api.com/"
+        "https://*.epicgames.com/"
     ],
     "background": {
         "service_worker": "background.js"

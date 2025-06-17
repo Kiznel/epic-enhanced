@@ -1,12 +1,13 @@
 // content.js
-// Version: 2.9.0 - Optimized passive adding to check cache first.
+// Version: 3.8.0 - Final bug fixes and feature implementations.
 
 // --- Globals ---
 let settings = {
     previewOnHover: true,
     enablePriceComparison: true,
     enableInLibraryIndicator: true,
-    priceComparedCountries: []
+    priceComparedCountries: [],
+    enableQuickPurchaseLink: true
 };
 const exchangeRateCache = new Map();
 let activeFetchController = null;
@@ -27,7 +28,7 @@ const currencyToCountryMap = {
     'HRK': 'HR', 'HTG': 'HT', 'HUF': 'HU', 'IDR': 'ID', 'ILS': 'IL', 'IMP': 'IM', 'INR': 'IN', 
     'IQD': 'IQ', 'IRR': 'IR', 'ISK': 'IS', 'JEP': 'JE', 'JMD': 'JM', 'JOD': 'JO', 'JPY': 'JP', 
     'KES': 'KE', 'KGS': 'KG', 'KHR': 'KH', 'KMF': 'KM', 'KPW': 'KP', 'KRW': 'KR', 'KWD': 'KW', 
-    'KYD': 'KY', 'KZT': 'KZ', 'LAK': 'LA', 'LBP': 'LB', 'LKR': 'LK', 'LRD': 'LR', 'LSL': 'LS', 
+    'KYD': 'KY', 'KZT': 'KZ', 'LAK': 'LA', 'LBP': 'LB', 'LRD': 'LR', 'LSL': 'LS', 
     'LYD': 'LY', 'MAD': 'MA', 'MDL': 'MD', 'MGA': 'MG', 'MKD': 'MK', 'MMK': 'MM', 'MNT': 'MN', 
     'MOP': 'MO', 'MRU': 'MR', 'MUR': 'MU', 'MVR': 'MV', 'MWK': 'MW', 'MXN': 'MX', 'MYR': 'MY', 
     'MZN': 'MZ', 'NAD': 'NA', 'NGN': 'NG', 'NIO': 'NI', 'NOK': 'NO', 'NPR': 'NP', 'NZD': 'NZ', 
@@ -56,6 +57,7 @@ const LISTENERS_ATTACHED_ATTR = 'data-epic-enhanced-listeners';
 const PRICE_HOVER_ENABLED_CLASS = 'epic-enhanced-price-hover-enabled';
 const SVG_TICK_ICON = `<svg xmlns="http://www.w3.org/2000/svg" class="popup-icon" viewBox="-10 -10 468.8 468.8"><path fill="currentColor" stroke-width="10" stroke="currentColor" d="M142.8 323.85L35.7 216.75 0 252.45l142.8 142.8 306-306-35.7-35.7z"></path></svg>`;
 const IN_LIBRARY_BUTTON_SELECTOR = 'button[data-testid="purchase-cta-button"]:disabled';
+const CHECKOUT_BUTTON_CONTAINER_SELECTOR = 'div[data-testid="cart-summary-cta"]';
 
 // --- Regional Price Fetching ---
 async function getExchangeRate(baseCurrency, targetCurrency) {
@@ -171,12 +173,20 @@ async function showPreviewPopup(targetElement, gameCardElement) {
 
     const popup = createManagedPopup(PREVIEW_POPUP_ID, 'epic-enhanced-preview-overlay');
     
-    if (popup.clickHandler) popup.removeEventListener('click', popup.clickHandler);
-    popup.clickHandler = (e) => {
+    if (popup.mouseHandler) {
+        popup.removeEventListener('mousedown', popup.mouseHandler);
+    }
+    
+    popup.mouseHandler = (e) => {
         if (e.target.closest('button')) return;
-        gameCardElement.click();
+        if (e.button === 0 && !e.ctrlKey && !e.metaKey) {
+            gameCardElement.click();
+        } else if (e.button === 1 || (e.button === 0 && (e.ctrlKey || e.metaKey))) {
+            e.preventDefault();
+            window.open(gameCardElement.href, '_blank');
+        }
     };
-    popup.addEventListener('click', popup.clickHandler);
+    popup.addEventListener('mousedown', popup.mouseHandler);
     
     const parentContainer = gameCardElement.closest('[data-component]');
     if (!parentContainer) return;
@@ -354,8 +364,12 @@ function appendPreviewDetails(popupElement, previewData, gameCardElement, isOwne
         });
         actionsContainer.appendChild(newWishlistButton);
     }
-    if (actionsContainer.hasChildNodes()) popupElement.appendChild(actionsContainer);
+
+    if (actionsContainer.hasChildNodes()) {
+        popupElement.appendChild(actionsContainer);
+    }
 }
+
 
 function hidePreviewPopupAndSpinner() {
     clearInterval(carouselInterval);
@@ -379,12 +393,45 @@ async function showRegionalPricePopup(targetElement) {
 
     const popup = createManagedPopup(REGIONAL_PRICE_POPUP_ID, 'epic-enhanced-regional-price-popup');
     popup.innerHTML = '<div class="price-loading-spinner"></div>';
-    popup.classList.add('visible');
-    
+    popup.className = 'epic-enhanced-regional-price-popup'; 
+
     const targetRect = targetElement.getBoundingClientRect();
-    popup.style.top = `${targetRect.bottom + 5}px`;
-    popup.style.left = `${targetRect.left}px`;
-    
+
+    const repositionPopup = () => {
+        const popupHeight = popup.offsetHeight;
+        const popupWidth = popup.offsetWidth;
+        const spacing = 12;
+
+        let top = targetRect.top + (targetRect.height / 2) - (popupHeight / 2);
+        let left = targetRect.left - popupWidth - spacing;
+
+        popup.classList.remove('arrow-on-left');
+
+        const margin = 10;
+        if (left < margin) {
+            left = targetRect.right + spacing;
+            popup.classList.add('arrow-on-left');
+        }
+
+        if (top < margin) {
+            top = margin;
+        }
+        if (top + popupHeight > window.innerHeight - margin) {
+            top = window.innerHeight - popupHeight - margin;
+        }
+
+        popup.style.left = `${left}px`;
+        popup.style.top = `${top}px`;
+        popup.style.visibility = 'visible';
+    };
+
+    popup.style.visibility = 'hidden';
+    popup.style.left = '-9999px';
+    popup.style.top = '-9999px';
+    popup.classList.add('visible');
+
+    repositionPopup();
+
     try {
         const pageSlug = getProductSlugFromUrl(window.location.href);
         if (!pageSlug) throw new Error("Could not determine page slug.");
@@ -431,29 +478,40 @@ async function showRegionalPricePopup(targetElement) {
         if (activePriceFetchController.signal.aborted) return;
         
         buildPriceTable(popup, priceData, basePrice, baseCountryCode);
+        repositionPopup();
 
     } catch (error) {
         if (error.name !== 'AbortError') {
             console.error("[EpicEnhanced] Price Comparison Error:", error);
             popup.innerHTML = `<div class="price-error">${error.message}</div>`;
+            repositionPopup();
         }
     }
 }
 
 function buildPriceTable(popup, priceData, basePrice, baseCountryCode) {
-    const userCountryCode = baseCountryCode;
     const basePriceRow = {
-        countryCode: userCountryCode,
+        countryCode: baseCountryCode,
         regionalPrice: { formatted: basePrice.formatted },
         convertedAmount: basePrice.amount,
         difference: 0,
         error: null
     };
-    let allPrices = [basePriceRow, ...priceData.filter(p => p.countryCode !== userCountryCode)];
-    
+
+    const finalOrderedPrices = [basePriceRow];
+
+    settings.priceComparedCountries.forEach(countryCode => {
+        if (countryCode === baseCountryCode) return;
+        
+        const priceInfo = priceData.find(p => p.countryCode === countryCode);
+        if (priceInfo) {
+            finalOrderedPrices.push(priceInfo);
+        }
+    });
+
     let tableHtml = '<div class="price-comparison-scroll-container"><div class="price-comparison-table">';
 
-    allPrices.forEach(data => {
+    finalOrderedPrices.forEach(data => {
         if (data.error) {
             tableHtml += `<div class="price-row"><div class="price-flag-cell">${getCountryFlag(data.countryCode)}</div><div class="price-error-cell" colspan="3">${data.error}</div></div>`;
             return;
@@ -476,6 +534,7 @@ function buildPriceTable(popup, priceData, basePrice, baseCountryCode) {
     popup.innerHTML = tableHtml;
 }
 
+
 function hideAllPopupsImmediately() {
     hidePreviewPopupAndSpinner();
     const libraryPopup = document.getElementById(LIBRARY_POPUP_ID);
@@ -495,10 +554,15 @@ function scheduleHideAllPopups() {
 // --- Data Fetching and Info Extraction ---
 async function fetchPreviewData(slug, signal) {
     const productUrl = `https://store.epicgames.com/en-US/p/${slug}`;
-    const response = await fetch(productUrl, { signal });
-    if (!response.ok) throw new Error(`HTML fetch failed: ${response.status}`);
-    const htmlText = await response.text();
-    const html = await new DOMParser().parseFromString(htmlText, 'text/html');
+    const [htmlResponse, offerDetails] = await Promise.all([
+        fetch(productUrl, { signal }),
+        fetchOfferDetails(slug, signal)
+    ]);
+
+    if (!htmlResponse.ok) throw new Error(`HTML fetch failed: ${htmlResponse.status}`);
+    const htmlText = await htmlResponse.text();
+    const html = new DOMParser().parseFromString(htmlText, 'text/html');
+
     const ogImage = html.querySelector('meta[property="og:image"]');
     const mainImageUrl = ogImage ? ogImage.content.split('?')[0] : null;
     const imageUrlSet = new Set();
@@ -542,7 +606,16 @@ async function fetchPreviewData(slug, signal) {
     const inLibraryButton = html.querySelector(IN_LIBRARY_BUTTON_SELECTOR);
     const isOwnedOnPage = !!(inLibraryButton && inLibraryButton.textContent.trim().toLowerCase() === 'in library');
 
-    return { imageUrls: Array.from(imageUrlSet), title, description, tags, releaseInfo, isOwnedOnPage };
+    return { 
+        imageUrls: Array.from(imageUrlSet), 
+        title, 
+        description, 
+        tags, 
+        releaseInfo, 
+        isOwnedOnPage,
+        offerId: offerDetails.offerId,
+        sandboxId: offerDetails.sandboxId
+    };
 }
 
 async function fetchOfferDetails(slug, signal) {
@@ -734,24 +807,20 @@ function getCountryFlag(countryCode) {
     return `<img src="${flagUrl}" class="price-country-flag" alt="${countryCode}" />`;
 }
 
-// MODIFIED: Optimized to check cache before trying to add
 async function passivelyAddGame(productSlug, title) {
     if (!title || !productSlug) return;
     
     try {
-        // First, check if we already think we own it.
         const ownershipResponse = await chrome.runtime.sendMessage({ 
             action: "checkGameInLibrary", 
             pageSlugFromCard: productSlug, 
             titleFromStorePage: title 
         });
 
-        // If it's already in the library, no need to proceed.
         if (ownershipResponse && ownershipResponse.inLibrary) {
             return;
         }
 
-        // If not in library, proceed to fetch details and send to background to add.
         const offerDetails = await fetchOfferDetails(productSlug, new AbortController().signal);
         if (offerDetails.offerId && offerDetails.sandboxId) {
             chrome.runtime.sendMessage({
@@ -820,6 +889,83 @@ function setupPriceHoverListener(priceElement) {
     priceElement.addEventListener('mouseleave', scheduleHideAllPopups);
 }
 
+function addQuickPurchaseButton() {
+    if (!settings.enableQuickPurchaseLink) {
+        const existingButton = document.getElementById('quick-purchase-btn');
+        if (existingButton) existingButton.remove();
+        return;
+    };
+
+    const checkoutContainer = document.querySelector(CHECKOUT_BUTTON_CONTAINER_SELECTOR);
+    if (!checkoutContainer || document.getElementById('quick-purchase-btn')) {
+        return;
+    }
+
+    const checkoutButton = checkoutContainer.querySelector('button');
+    if (!checkoutButton) return;
+
+    const quickPurchaseButton = document.createElement('button');
+    quickPurchaseButton.id = 'quick-purchase-btn';
+    quickPurchaseButton.className = 'epic-enhanced-quick-purchase-link-btn';
+    quickPurchaseButton.textContent = 'Generate Quick-Purchase Link';
+
+    quickPurchaseButton.addEventListener('click', async () => {
+        quickPurchaseButton.textContent = 'Generating...';
+        quickPurchaseButton.disabled = true;
+
+        try {
+            const getCartItemsUrl = 'https://store.epicgames.com/graphql';
+            const body = {
+                "query": "query getCartItems { Cart { cartItems { elements { id namespace offerId } } } }"
+            };
+            
+            const response = await fetch(getCartItemsUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(body)
+            });
+
+            if (!response.ok) throw new Error('Failed to fetch cart items.');
+            
+            const cartData = await response.json();
+            const items = cartData?.data?.Cart?.cartItems?.elements;
+
+            if (!items || items.length === 0) {
+                 quickPurchaseButton.textContent = 'Cart is empty!';
+                 setTimeout(() => {
+                    quickPurchaseButton.textContent = 'Generate Quick-Purchase Link';
+                    quickPurchaseButton.disabled = false;
+                }, 2000);
+                return;
+            }
+
+            const offerParams = items.map(item => `offers=1-${item.namespace}-${item.offerId}`).join('&');
+            const purchaseUrl = `https://store.epicgames.com/purchase?highlightColor=0078f2&${offerParams}`;
+            
+            const tempInput = document.createElement('textarea');
+            tempInput.value = purchaseUrl;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            quickPurchaseButton.textContent = 'Copied to clipboard!';
+
+        } catch (error) {
+            console.error('Failed to generate quick-purchase link:', error);
+            quickPurchaseButton.textContent = 'Error!';
+        }
+
+        setTimeout(() => {
+            quickPurchaseButton.textContent = 'Generate Quick-Purchase Link';
+            quickPurchaseButton.disabled = false;
+        }, 2000);
+    });
+
+    checkoutButton.parentNode.insertBefore(quickPurchaseButton, checkoutButton.nextSibling);
+}
+
 function processPageElements() {
     document.querySelectorAll(TARGET_GAME_ELEMENT_SELECTOR).forEach(card => {
         checkAndApplyStyles(card);
@@ -842,6 +988,10 @@ function processPageElements() {
             passivelyAddGame(getProductSlugFromUrl(window.location.href), document.querySelector('#app-main-content h1')?.textContent.trim() || document.title.split('|')[0].trim());
         }
     }
+
+    if (path.includes('/cart')) {
+        addQuickPurchaseButton();
+    }
 }
 
 // --- Initialization ---
@@ -851,12 +1001,17 @@ const observer = new MutationObserver(() => {
     timeoutId = setTimeout(() => processPageElements(), 250);
 });
 
-function initialSetup() {
-    const settingKeys = ['previewOnHover', 'enablePriceComparison', 'priceComparedCountries', 'enableInLibraryIndicator'];
-    chrome.storage.local.get(settingKeys, (result) => {
-        Object.assign(settings, result);
-        processPageElements();
+async function initialSetup() {
+    const settingKeys = ['previewOnHover', 'enablePriceComparison', 'priceComparedCountries', 'enableInLibraryIndicator', 'enableQuickPurchaseLink'];
+    
+    await new Promise(resolve => {
+        chrome.storage.local.get(settingKeys, (result) => {
+            Object.assign(settings, result);
+            resolve();
+        });
     });
+    
+    processPageElements();
 
     chrome.storage.onChanged.addListener((changes, namespace) => {
         if (namespace !== 'local') return;
@@ -864,7 +1019,7 @@ function initialSetup() {
         const hasRelevantChange = Object.keys(changes).some(key => settingKeys.includes(key));
 
         if (hasRelevantChange) {
-            chrome.storage.local.get(settingKeys, (result) => {
+            chrome.storage.local.get(settingKeys, async (result) => {
                 Object.assign(settings, result);
 
                 document.querySelectorAll(`[${STYLED_FOR_OWNERSHIP_ATTR}]`).forEach(el => {
@@ -887,7 +1042,6 @@ function initialSetup() {
         }
     });
     
-    processPageElements();
     observer.observe(document.body, { childList: true, subtree: true });
     window.addEventListener('blur', hideAllPopupsImmediately);
     
