@@ -1,5 +1,5 @@
 /* styles.css */
-/* Version: 1.6.0 - Final styling updates and bug fixes. */
+/* Version: 1.7.0 - Added styles for store page links. */
 
 /* --- Owned Game Indicator --- */
 .epic-enhanced-in-library-popup {
@@ -425,3 +425,34 @@ body.popup-body {
 .popup-body .status-success { background-color: #235c23; color: #c0ffc0; }
 .popup-body .status-progress { background-color: #234a5c; color: #c0e7ff; }
 .popup-body .privacy-note { font-size: 10px; color: #888888; margin-top:15px; }
+
+/* --- Store Page Links --- */
+.epic-enhanced-store-link-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background-color: #333;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 8px; /* Rounded corners for the square button */
+  transition: background-color 0.2s, border-color 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.epic-enhanced-store-link-btn:hover {
+  background-color: #444;
+  border-color: #777;
+  color: #fff;
+}
+
+.epic-enhanced-store-link-btn svg,
+.epic-enhanced-store-link-btn img {
+  width: 18px; /* Adjust icon size */
+  height: 18px;
+  /* Ensure image icon isn't affected by link color */
+  color: unset; 
+}
